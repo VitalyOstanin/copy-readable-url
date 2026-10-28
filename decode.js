@@ -1,21 +1,41 @@
-// Decodes only percent-escaped non-ASCII bytes (UTF-8 sequences such as
-// Cyrillic). ASCII escapes like %20, %2F, %3F stay encoded, so the URL keeps
-// its structure and stays usable as a markdown link target.
-const NON_ASCII_RUN = /(?:%[89A-Fa-f][0-9A-Fa-f])+/g;
+import { decodeHost } from './idn.js';
+
+// Decodes only percent-escaped UTF-8 sequences of non-ASCII characters (such
+// as Cyrillic). ASCII escapes like %20, %2F, %3F stay encoded, so the URL keeps
+// its structure and stays usable as a markdown link target. Each character is
+// matched separately, so one malformed byte does not block its neighbours.
+const CONT = '%[89ABab][0-9A-Fa-f]';
+const UTF8_CHAR = new RegExp(
+  `%[CDcd][0-9A-Fa-f]${CONT}|%[Ee][0-9A-Fa-f](?:${CONT}){2}|%[Ff][0-7](?:${CONT}){3}`,
+  'g',
+);
+// Invisible or layout-changing characters (spaces, controls, bidi overrides)
+// stay encoded: decoded they are unreadable or let a URL look like another.
+const KEEP_ENCODED = /[\p{Z}\p{C}]/u;
+// scheme://[userinfo@]host[:port] — only the host part goes through IDN
+// decoding.
+const AUTHORITY = /^([a-z][a-z0-9+.-]*:\/\/(?:[^/?#@]*@)?)([^/?#:]*)/i;
 
 export function decodeReadable(url) {
-  return url.replace(NON_ASCII_RUN, (run) => {
+  const readable = url.replace(AUTHORITY, (_, prefix, host) => prefix + decodeHost(host));
+  return decodePercent(readable);
+}
+
+function decodePercent(text) {
+  return text.replace(UTF8_CHAR, (seq) => {
+    let ch;
     try {
-      return decodeURIComponent(run);
+      ch = decodeURIComponent(seq);
     } catch {
-      // Not valid UTF-8 (e.g. a cp1251-encoded query): keep as is.
-      return run;
+      // Overlong or surrogate encoding: keep as is.
+      return seq;
     }
+    return KEEP_ENCODED.test(ch) ? seq : ch;
   });
 }
 
-// Title is the last non-empty path segment, fully decoded; the host when the
-// path is empty.
+// Title is the last non-empty path segment, fully decoded, with whitespace
+// runs collapsed; the host when the path gives nothing.
 export function titleFromUrl(url) {
   let parsed;
   try {
@@ -23,17 +43,21 @@ export function titleFromUrl(url) {
   } catch {
     return url;
   }
-  const segment = parsed.pathname.split('/').filter(Boolean).pop();
-  if (!segment) return parsed.hostname || url;
+  const segment = parsed.pathname.split('/').filter(Boolean).pop() ?? '';
+  let title;
   try {
-    return decodeURIComponent(segment);
+    title = decodeURIComponent(segment);
   } catch {
-    return decodeReadable(segment);
+    title = decodePercent(segment);
   }
+  title = title.replace(/[\p{Z}\p{C}\s]+/gu, ' ').trim();
+  return title || decodeHost(parsed.hostname) || url;
 }
 
+// `_` is left alone: intraword underscores (Красная_площадь) are not emphasis
+// in CommonMark, and escaping them would clutter the common case.
 export function markdownLink(url) {
-  const title = titleFromUrl(url).replace(/([\\[\]])/g, '\\$1');
+  const title = titleFromUrl(url).replace(/([\\[\]*`<])/g, '\\$1');
   const target = decodeReadable(url);
   return `[${title}](${needsAngleBrackets(target) ? `<${target}>` : target})`;
 }

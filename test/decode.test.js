@@ -42,3 +42,29 @@ test('markdown link escapes brackets and wraps unbalanced parens', () => {
   assert.equal(markdownLink('https://x.org/f(x)'), '[f(x)](https://x.org/f(x))');
   assert.equal(markdownLink('https://x.org/a)b'), '[a)b](<https://x.org/a)b>)');
 });
+
+test('decodes valid characters next to a malformed byte', () => {
+  assert.equal(decodeReadable('https://x.org/%D0%B4%FF%D1%8F'), 'https://x.org/д%FFя');
+});
+
+test('keeps invisible and bidi characters encoded', () => {
+  // NBSP, zero-width space, right-to-left override
+  assert.equal(
+    decodeReadable('https://x.org/a%C2%A0b%E2%80%8Bc%E2%80%AEd'),
+    'https://x.org/a%C2%A0b%E2%80%8Bc%E2%80%AEd',
+  );
+});
+
+test('title collapses newlines and falls back to host', () => {
+  assert.equal(titleFromUrl('https://x.org/a%0A%0Ab'), 'a b');
+  assert.equal(titleFromUrl('https://x.org/%20/'), 'x.org');
+});
+
+test('decodes 4-byte characters', () => {
+  assert.equal(decodeReadable('https://x.org/%F0%9F%98%80'), 'https://x.org/😀');
+});
+
+test('title escapes emphasis, code and HTML starters', () => {
+  assert.equal(markdownLink('https://x.org/a*b*%60c%60%3Cd%3E'), '[a\\*b\\*\\`c\\`\\<d>](https://x.org/a*b*%60c%60%3Cd%3E)');
+  assert.equal(markdownLink('https://x.org/a_b'), '[a_b](https://x.org/a_b)');
+});

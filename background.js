@@ -32,17 +32,24 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
 });
 
 async function copy(url, format, tabId) {
-  if (!url) {
-    flashBadge(tabId, 'ERR', '#c62828');
-    return;
+  let ok = false;
+  try {
+    if (url) {
+      await ensureOffscreen();
+      ok = await chrome.runtime.sendMessage({
+        target: 'offscreen',
+        text: format(url),
+      });
+    }
+  } catch (err) {
+    console.error('copy failed', err);
   }
-  await ensureOffscreen();
-  const ok = await chrome.runtime.sendMessage({
-    target: 'offscreen',
-    text: format(url),
-  });
   flashBadge(tabId, ok ? 'OK' : 'ERR', ok ? '#2e7d32' : '#c62828');
 }
+
+// Shared so that two quick copies do not both try to create the document:
+// a second createDocument call fails while the first is still pending.
+let creating = null;
 
 async function ensureOffscreen() {
   const contexts = await chrome.runtime.getContexts({
@@ -50,16 +57,31 @@ async function ensureOffscreen() {
     documentUrls: [chrome.runtime.getURL(OFFSCREEN_URL)],
   });
   if (contexts.length > 0) return;
-  await chrome.offscreen.createDocument({
-    url: OFFSCREEN_URL,
-    reasons: [chrome.offscreen.Reason.CLIPBOARD],
-    justification: 'Write the decoded URL to the clipboard.',
-  });
+  creating ??= chrome.offscreen
+    .createDocument({
+      url: OFFSCREEN_URL,
+      reasons: [chrome.offscreen.Reason.CLIPBOARD],
+      justification: 'Write the decoded URL to the clipboard.',
+    })
+    .finally(() => {
+      creating = null;
+    });
+  await creating;
 }
+
+const badgeTimers = new Map();
 
 function flashBadge(tabId, text, color) {
   if (tabId === undefined) return;
-  chrome.action.setBadgeBackgroundColor({ tabId, color });
-  chrome.action.setBadgeText({ tabId, text });
-  setTimeout(() => chrome.action.setBadgeText({ tabId, text: '' }), 1500);
+  clearTimeout(badgeTimers.get(tabId));
+  // The tab may already be closed; the badge is cosmetic, so ignore that.
+  chrome.action.setBadgeBackgroundColor({ tabId, color }).catch(() => {});
+  chrome.action.setBadgeText({ tabId, text }).catch(() => {});
+  badgeTimers.set(
+    tabId,
+    setTimeout(() => {
+      badgeTimers.delete(tabId);
+      chrome.action.setBadgeText({ tabId, text: '' }).catch(() => {});
+    }, 1500),
+  );
 }
