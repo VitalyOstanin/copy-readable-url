@@ -1,0 +1,8 @@
+{
+  "name": "copy-readable-url",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  }
+}

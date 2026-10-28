@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Copy Readable URL",
+  "version": "0.1.0",
+  "description": "Copies URLs with non-ASCII characters (Cyrillic etc.) decoded.",
+  "minimum_chrome_version": "116",
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Copy Readable URL"
+  },
+  "permissions": ["activeTab", "contextMenus", "offscreen", "clipboardWrite"],
+  "commands": {
+    "copy-page-url": {
+      "suggested_key": { "default": "Alt+U" },
+      "description": "Копировать адрес страницы"
+    },
+    "copy-page-markdown": {
+      "suggested_key": { "default": "Alt+Shift+U" },
+      "description": "Копировать адрес страницы как markdown-ссылку"
+    }
+  }
+}
