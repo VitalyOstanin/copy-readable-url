@@ -1,46 +1,91 @@
 # Copy Readable URL
 
-Расширение Chromium (Brave, Chrome) для этой машины: копирует адрес так, что кириллица и другие не-ASCII символы остаются читаемыми, а не превращаются в `%D0%...`.
+A Chromium extension (Chrome, Brave, Edge) that copies URLs with Cyrillic and other non-ASCII characters readable, instead of the percent-encoded form (`%D0%9C%D0%BE...`) the address bar puts on the clipboard. It can also copy a URL as a ready markdown link.
 
-## Содержание
+```
+https://ru.wikipedia.org/wiki/%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0
+→ https://ru.wikipedia.org/wiki/Москва
+→ [Москва](https://ru.wikipedia.org/wiki/Москва)
+```
 
-- [Назначение](#назначение)
-- [Использование](#использование)
-- [Установка](#установка)
-- [Что раскодируется](#что-раскодируется)
-- [Тесты](#тесты)
+## Contents
 
-## Назначение
+- [Why](#why)
+- [Usage](#usage)
+- [Installation](#installation)
+- [Установка (по-русски)](#установка-по-русски)
+- [What gets decoded](#what-gets-decoded)
+- [Permissions and privacy](#permissions-and-privacy)
+- [Development](#development)
+- [License](#license)
 
-Адресная строка Chromium при копировании всего адреса кладёт в буфер канонический URL, где не-ASCII символы закодированы (`AdjustTextForCopy` в `components/omnibox/browser/omnibox_text_util.cc`). Настройки, отключающей это, нет.
+## Why
 
-## Использование
+When the whole address is copied, Chromium's address bar writes the canonical URL to the clipboard, with every non-ASCII character percent-encoded (`AdjustTextForCopy` in [`components/omnibox/browser/omnibox_text_util.cc`](https://chromium.googlesource.com/chromium/src/+/refs/heads/main/components/omnibox/browser/omnibox_text_util.cc)). There is no setting to turn this off. Firefox has one: `browser.urlbar.decodeURLsOnCopy` in `about:config`.
 
-| № | Способ                                                              | Что копирует                          |
-|---|---------------------------------------------------------------------|---------------------------------------|
-| 1 | `Alt+U`                                                             | адрес текущей вкладки                 |
-| 2 | `Alt+Shift+U`                                                       | адрес текущей вкладки как markdown    |
-| 3 | меню ссылки: «Копировать ссылку»                                    | адрес ссылки                          |
-| 4 | меню ссылки: «Копировать ссылку как markdown»                       | адрес ссылки как markdown             |
-| 5 | меню страницы: «Копировать адрес страницы»                          | адрес страницы                        |
-| 6 | меню страницы: «Копировать адрес страницы как markdown»             | адрес страницы как markdown           |
+## Usage
 
-Markdown-ссылка имеет вид `[заголовок](адрес)`. Заголовок — последняя непустая часть пути, раскодированная полностью (включая `%20`); при пустом пути — имя хоста. Символы `[`, `]`, `*`, `` ` ``, `<` и `\` в заголовке экранируются, `_` нет (внутри слова он не даёт курсива); пробельные, управляющие и bidi-символы в адресе остаются закодированными, адрес с несбалансированными круглыми скобками или пробелом оборачивается в `<...>`.
+| #   | Action                                              | Copies                         |
+|-----|-----------------------------------------------------|--------------------------------|
+| 1   | `Alt+U`                                             | URL of the current tab         |
+| 2   | `Alt+Shift+U`                                       | URL of the current tab as markdown link |
+| 3   | Link context menu → *Copy link*                     | link URL                       |
+| 4   | Link context menu → *Copy link as markdown*         | link URL as markdown link      |
+| 5   | Page context menu → *Copy page URL*                 | page URL                       |
+| 6   | Page context menu → *Copy page URL as markdown*     | page URL as markdown link      |
 
-На значке расширения на 1,5 с появляется `OK` или `ERR`. Сочетание клавиш меняется на `brave://extensions/shortcuts`.
+The extension badge shows `OK` or `ERR` for 1.5 seconds after each copy. Menu items and shortcut names follow the browser language (English or Russian).
 
-## Установка
+A markdown link is `[title](url)`. The title is the last non-empty path segment, fully decoded (`%20` becomes a space), or the host name when the path is empty.
 
-1. Открыть `brave://extensions`, включить «Режим разработчика».
-2. «Загрузить распакованное расширение» и выбрать этот каталог.
-3. После правки кода нажать кнопку обновления на карточке расширения.
+## Installation
 
-## Что раскодируется
+The extension is not in the Chrome Web Store yet and is installed as an unpacked extension.
 
-Только последовательности `%XX` с байтами 0x80–0xFF, образующие корректный UTF-8. ASCII-коды (`%20`, `%2F`, `%3F`, `%26`) остаются закодированными, иначе адрес сломается в markdown или изменит смысл. Последовательности не в UTF-8 (например, cp1251) не трогаются. Домены в punycode (`xn--...`) раскодируются по частям имени (RFC 3492), если все буквы части из одного алфавита (латиница, кириллица, греческий и др.; японские Han+Hiragana+Katakana и корейские Hangul+Han — как один) и раскодированная часть обратно даёт тот же `xn--`. Алфавит определяется по Script_Extensions (японский знак `ー` относится к кане). В punycode остаются части со смешением алфавитов (`аpple` с кириллической `а`) и, вне кириллических доменов верхнего уровня, части только из кириллических двойников латинских букв (`аррӏе.com`), чтобы ссылка не выдавала себя за другой сайт.
+1. Get the code: `git clone https://github.com/VitalyOstanin/copy-readable-url.git`, or download the ZIP from GitHub and unpack it.
+2. Open `chrome://extensions` (`brave://extensions` in Brave, `edge://extensions` in Edge) and turn on *Developer mode*.
+3. Click *Load unpacked* and select the project directory (the one containing `manifest.json`).
+4. Check the shortcuts on `chrome://extensions/shortcuts` (in Brave: *Keyboard shortcuts* in the left panel of `brave://extensions`). If another extension already uses `Alt+U` or `Alt+Shift+U`, the browser leaves the command without a shortcut; assign one there.
 
-## Тесты
+To update: `git pull` (or unpack a fresh ZIP into the same directory) and press the reload button on the extension card. Keep the directory in place: the browser loads the extension from it on every start.
+
+## Установка (по-русски)
+
+Расширения пока нет в Chrome Web Store, оно ставится как распакованное.
+
+1. Скачайте код: `git clone https://github.com/VitalyOstanin/copy-readable-url.git` или ZIP со страницы GitHub, распакуйте.
+2. Откройте `chrome://extensions` (в Brave — `brave://extensions`, в Edge — `edge://extensions`) и включите «Режим разработчика» (*Developer mode*).
+3. Нажмите «Загрузить распакованное расширение» (*Load unpacked*) и выберите каталог проекта, в котором лежит `manifest.json`.
+4. Проверьте сочетания клавиш на `chrome://extensions/shortcuts` (в Brave — пункт *Keyboard shortcuts* слева на `brave://extensions`). Если `Alt+U` или `Alt+Shift+U` уже заняты другим расширением, браузер оставит команду без сочетания — назначьте его там вручную.
+
+Обновление: `git pull` (или распаковать новый ZIP в тот же каталог) и кнопка обновления на карточке расширения. Каталог не удаляйте: браузер загружает расширение из него при каждом запуске.
+
+## What gets decoded
+
+- **Path, query, fragment.** Percent-encoded UTF-8 sequences of non-ASCII characters are decoded one character at a time. ASCII escapes (`%20`, `%2F`, `%3F`, `%26`) stay encoded so the URL keeps its meaning and stays a valid markdown link target. Invalid UTF-8 (for example, a cp1251-encoded query) is left as is.
+- **Invisible characters stay encoded:** spaces, control characters and bidirectional overrides (`%C2%A0`, `%E2%80%8B`, `%E2%80%AE`), so a decoded URL cannot look like a different one.
+- **Domain names** (`xn--...`, punycode) are decoded label by label when all letters of the label belong to one writing system (Latin, Cyrillic, Greek, Japanese, Korean and others) and the decoded label converts back to the same `xn--` form. Labels mixing alphabets (`аpple` with a Cyrillic `а`) stay in punycode. Outside Cyrillic top-level domains, labels made only of Cyrillic letters that look like Latin ones (`аррӏе.com`) stay in punycode too.
+- **Markdown title:** `[`, `]`, `*`, `` ` ``, `<` and `\` are escaped; `_` is not, since an underscore inside a word is not emphasis in CommonMark. A target with unbalanced parentheses is wrapped in `<...>`.
+
+## Permissions and privacy
+
+| #   | Permission      | Used for                                                                 |
+|-----|-----------------|--------------------------------------------------------------------------|
+| 1   | `activeTab`     | reading the URL of the current tab when a shortcut is pressed            |
+| 2   | `contextMenus`  | the four context menu items                                              |
+| 3   | `offscreen`     | a hidden page that writes to the clipboard (service workers cannot)      |
+| 4   | `clipboardWrite`| writing the decoded URL to the clipboard                                 |
+
+The extension makes no network requests, stores nothing and reads only the URL you ask it to copy.
+
+## Development
+
+No build step: the extension is plain JavaScript modules loaded as is. Tests need Node.js 20 or newer:
 
 ```
 npm test
 ```
+
+## License
+
+[MIT](LICENSE)

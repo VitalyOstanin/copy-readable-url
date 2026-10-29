@@ -1,0 +1,10 @@
+{
+  "extName": { "message": "Copy Readable URL" },
+  "extDescription": { "message": "Copies URLs with non-ASCII characters (Cyrillic etc.) decoded, as plain text or as a markdown link." },
+  "copyPageUrl": { "message": "Copy page URL" },
+  "copyPageMarkdown": { "message": "Copy page URL as markdown link" },
+  "menuCopyLink": { "message": "Copy link" },
+  "menuCopyLinkMarkdown": { "message": "Copy link as markdown" },
+  "menuCopyPage": { "message": "Copy page URL" },
+  "menuCopyPageMarkdown": { "message": "Copy page URL as markdown" }
+}

@@ -2,18 +2,19 @@ import { decodeReadable, markdownLink } from './decode.js';
 
 const OFFSCREEN_URL = 'offscreen.html';
 
-// Each format has a keyboard command and a link/page context menu pair.
+// Each format has a keyboard command and a link/page context menu pair;
+// menu titles are message names from _locales.
 const FORMATS = {
-  url: { format: decodeReadable, link: 'Копировать ссылку', page: 'Копировать адрес страницы' },
-  md: { format: markdownLink, link: 'Копировать ссылку как markdown', page: 'Копировать адрес страницы как markdown' },
+  url: { format: decodeReadable, link: 'menuCopyLink', page: 'menuCopyPage' },
+  md: { format: markdownLink, link: 'menuCopyLinkMarkdown', page: 'menuCopyPageMarkdown' },
 };
 const COMMANDS = { 'copy-page-url': 'url', 'copy-page-markdown': 'md' };
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.removeAll(() => {
     for (const [key, { link, page }] of Object.entries(FORMATS)) {
-      chrome.contextMenus.create({ id: `${key}:link`, title: link, contexts: ['link'] });
-      chrome.contextMenus.create({ id: `${key}:page`, title: page, contexts: ['page'] });
+      chrome.contextMenus.create({ id: `${key}:link`, title: chrome.i18n.getMessage(link), contexts: ['link'] });
+      chrome.contextMenus.create({ id: `${key}:page`, title: chrome.i18n.getMessage(page), contexts: ['page'] });
     }
   });
 });

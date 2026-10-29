@@ -1,0 +1,10 @@
+{
+  "extName": { "message": "Copy Readable URL" },
+  "extDescription": { "message": "Копирует адреса с раскодированной кириллицей и другими не-ASCII символами — текстом или markdown-ссылкой." },
+  "copyPageUrl": { "message": "Копировать адрес страницы" },
+  "copyPageMarkdown": { "message": "Копировать адрес страницы как markdown-ссылку" },
+  "menuCopyLink": { "message": "Копировать ссылку" },
+  "menuCopyLinkMarkdown": { "message": "Копировать ссылку как markdown" },
+  "menuCopyPage": { "message": "Копировать адрес страницы" },
+  "menuCopyPageMarkdown": { "message": "Копировать адрес страницы как markdown" }
+}
