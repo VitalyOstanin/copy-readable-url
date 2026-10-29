@@ -13,7 +13,9 @@ https://ru.wikipedia.org/wiki/%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0
 - [Why](#why)
 - [Usage](#usage)
 - [Installation](#installation)
+- [Keyboard shortcuts](#keyboard-shortcuts)
 - [Установка (по-русски)](#установка-по-русски)
+  - [Сочетания клавиш](#сочетания-клавиш)
 - [What gets decoded](#what-gets-decoded)
 - [Permissions and privacy](#permissions-and-privacy)
 - [Development](#development)
@@ -45,9 +47,26 @@ The extension is not in the Chrome Web Store yet and is installed as an unpacked
 1. Get the code: `git clone https://github.com/VitalyOstanin/copy-readable-url.git`, or download the ZIP from GitHub and unpack it.
 2. Open `chrome://extensions` (`brave://extensions` in Brave, `edge://extensions` in Edge) and turn on *Developer mode*.
 3. Click *Load unpacked* and select the project directory (the one containing `manifest.json`).
-4. Check the shortcuts on `chrome://extensions/shortcuts` (in Brave: *Keyboard shortcuts* in the left panel of `brave://extensions`). If another extension already uses `Alt+U` or `Alt+Shift+U`, the browser leaves the command without a shortcut; assign one there.
+4. Check that both shortcuts are assigned, see [Keyboard shortcuts](#keyboard-shortcuts).
 
 To update: `git pull` (or unpack a fresh ZIP into the same directory) and press the reload button on the extension card. Keep the directory in place: the browser loads the extension from it on every start.
+
+## Keyboard shortcuts
+
+The extension suggests `Alt+U` (copy page URL) and `Alt+Shift+U` (copy page URL as markdown). The browser assigns a suggested shortcut only if no other extension uses it; otherwise the command stays without a shortcut and nothing happens when the keys are pressed.
+
+To check or change the shortcuts:
+
+1. Open the shortcuts page:
+   - Chrome: `chrome://extensions/shortcuts`;
+   - Edge: `edge://extensions/shortcuts`;
+   - Brave: open `brave://extensions` and choose *Keyboard shortcuts* in the left panel.
+2. Find *Copy Readable URL*. It lists two commands: *Copy page URL* and *Copy page URL as markdown link*.
+3. Click the edit button (or the empty field) next to a command and press the new combination. A shortcut must include `Ctrl` or `Alt`; on macOS, `Alt` is the `Option` key and `Ctrl` becomes `Command`.
+4. If the combination is already used by another extension, either choose another one or first clear it in that extension (on the same page), then assign it here.
+5. Leave the scope at *In Chrome* (*In Brave*, *In Edge*), not *Global*: the extension needs the active tab of the focused browser window.
+
+The context menu items do not need shortcuts and work regardless of these settings.
 
 ## Установка (по-русски)
 
@@ -56,9 +75,26 @@ To update: `git pull` (or unpack a fresh ZIP into the same directory) and press 
 1. Скачайте код: `git clone https://github.com/VitalyOstanin/copy-readable-url.git` или ZIP со страницы GitHub, распакуйте.
 2. Откройте `chrome://extensions` (в Brave — `brave://extensions`, в Edge — `edge://extensions`) и включите «Режим разработчика» (*Developer mode*).
 3. Нажмите «Загрузить распакованное расширение» (*Load unpacked*) и выберите каталог проекта, в котором лежит `manifest.json`.
-4. Проверьте сочетания клавиш на `chrome://extensions/shortcuts` (в Brave — пункт *Keyboard shortcuts* слева на `brave://extensions`). Если `Alt+U` или `Alt+Shift+U` уже заняты другим расширением, браузер оставит команду без сочетания — назначьте его там вручную.
+4. Проверьте, что оба сочетания назначены, см. [Сочетания клавиш](#сочетания-клавиш).
 
 Обновление: `git pull` (или распаковать новый ZIP в тот же каталог) и кнопка обновления на карточке расширения. Каталог не удаляйте: браузер загружает расширение из него при каждом запуске.
+
+### Сочетания клавиш
+
+Расширение предлагает `Alt+U` (скопировать адрес страницы) и `Alt+Shift+U` (скопировать адрес страницы как ссылку markdown). Браузер назначает предложенное сочетание, только если его не использует другое расширение; иначе команда остаётся без сочетания, и нажатие клавиш ничего не делает.
+
+Как проверить или изменить сочетания:
+
+1. Откройте страницу сочетаний:
+   - Chrome: `chrome://extensions/shortcuts`;
+   - Edge: `edge://extensions/shortcuts`;
+   - Brave: откройте `brave://extensions` и выберите *Keyboard shortcuts* в левой панели.
+2. Найдите *Copy Readable URL*. У него две команды: «Копировать адрес страницы» и «Копировать адрес страницы как markdown-ссылку» (при английском интерфейсе — *Copy page URL* и *Copy page URL as markdown link*).
+3. Нажмите кнопку редактирования (или пустое поле) рядом с командой и нажмите новое сочетание. Сочетание должно включать `Ctrl` или `Alt`; на macOS `Alt` — это клавиша `Option`, а `Ctrl` заменяется на `Command`.
+4. Если сочетание уже занято другим расширением, выберите другое или сначала снимите его у того расширения (на этой же странице), затем назначьте здесь.
+5. Область действия оставьте прежней — только в браузере (*In Chrome*, *In Brave*, *In Edge*), не глобальной (*Global*): расширению нужна активная вкладка окна браузера, находящегося в фокусе.
+
+Пункты контекстного меню от сочетаний не зависят и работают всегда.
 
 ## What gets decoded
 
