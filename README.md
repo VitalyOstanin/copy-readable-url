@@ -100,6 +100,7 @@ The context menu items do not need shortcuts and work regardless of these settin
 
 - **Path, query, fragment.** Percent-encoded UTF-8 sequences of non-ASCII characters are decoded one character at a time. ASCII escapes (`%20`, `%2F`, `%3F`, `%26`) stay encoded so the URL keeps its meaning and stays a valid markdown link target. Invalid UTF-8 (for example, a cp1251-encoded query) is left as is.
 - **Invisible characters stay encoded:** spaces, control characters and bidirectional overrides (`%C2%A0`, `%E2%80%8B`, `%E2%80%AE`), so a decoded URL cannot look like a different one.
+- **Guillemets and typographic quotes stay encoded** (`«` `»` `“` `”` `…` and the rest of General Punctuation except dashes): Telegram ends an auto-detected link at them, so a decoded `«...»` would cut the pasted link short.
 - **Domain names** (`xn--...`, punycode) are decoded label by label when all letters of the label belong to one writing system (Latin, Cyrillic, Greek, Japanese, Korean and others) and the decoded label converts back to the same `xn--` form. Labels mixing alphabets (`аpple` with a Cyrillic `а`) stay in punycode. Outside Cyrillic top-level domains, labels made only of Cyrillic letters that look like Latin ones (`аррӏе.com`) stay in punycode too.
 - **Markdown title:** `[`, `]`, `*`, `` ` ``, `<` and `\` are escaped; `_` is not, since an underscore inside a word is not emphasis in CommonMark. A target with unbalanced parentheses is wrapped in `<...>`.
 

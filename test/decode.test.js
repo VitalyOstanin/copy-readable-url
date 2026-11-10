@@ -55,6 +55,18 @@ test('keeps invisible and bidi characters encoded', () => {
   );
 });
 
+test('keeps guillemets and quotes encoded so messengers keep the whole link', () => {
+  // «Ab» “c” d…e, en dash stays decoded
+  assert.equal(
+    decodeReadable('https://example.org/%C2%AB%D0%90b%C2%BB+%E2%80%9Cc%E2%80%9D+d%E2%80%A6e%E2%80%93f'),
+    'https://example.org/%C2%ABАb%C2%BB+%E2%80%9Cc%E2%80%9D+d%E2%80%A6e–f',
+  );
+  assert.equal(
+    markdownLink('https://example.org/%C2%AB%D0%90b%C2%BB'),
+    '[«Аb»](https://example.org/%C2%ABАb%C2%BB)',
+  );
+});
+
 test('title collapses newlines and falls back to host', () => {
   assert.equal(titleFromUrl('https://example.org/a%0A%0Ab'), 'a b');
   assert.equal(titleFromUrl('https://example.org/%20/'), 'example.org');

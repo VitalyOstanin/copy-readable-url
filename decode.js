@@ -11,7 +11,11 @@ const UTF8_CHAR = new RegExp(
 );
 // Invisible or layout-changing characters (spaces, controls, bidi overrides)
 // stay encoded: decoded they are unreadable or let a URL look like another.
-const KEEP_ENCODED = /[\p{Z}\p{C}]/u;
+// Guillemets and General Punctuation other than dashes (quotes, ellipsis,
+// U+2016-U+206F) stay encoded too: Telegram ends a link at them
+// (is_url_path_symbol in tdlib's MessageEntity.cpp), so «...» in a decoded
+// path would cut the pasted link short.
+const KEEP_ENCODED = /[\p{Z}\p{C}\u00AB\u00BB\u2016-\u206F]/u;
 // scheme://[userinfo@]host[:port] — only the host part goes through IDN
 // decoding.
 const AUTHORITY = /^([a-z][a-z0-9+.-]*:\/\/(?:[^/?#@]*@)?)([^/?#:]*)/i;
