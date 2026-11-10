@@ -29,12 +29,14 @@ When the whole address is copied, Chromium's address bar writes the canonical UR
 
 | #   | Action                                              | Copies                         |
 |-----|-----------------------------------------------------|--------------------------------|
-| 1   | `Alt+U`                                             | URL of the current tab         |
-| 2   | `Alt+Shift+U`                                       | URL of the current tab as markdown link |
+| 1   | `Alt+U` (may need to be assigned, see below)        | URL of the current tab         |
+| 2   | `Alt+Shift+U` (may need to be assigned, see below)  | URL of the current tab as markdown link |
 | 3   | Link context menu → *Copy link*                     | link URL                       |
 | 4   | Link context menu → *Copy link as markdown*         | link URL as markdown link      |
 | 5   | Page context menu → *Copy page URL*                 | page URL                       |
 | 6   | Page context menu → *Copy page URL as markdown*     | page URL as markdown link      |
+
+`Alt+U` and `Alt+Shift+U` are only suggested shortcuts. If another extension already uses one of them, the browser leaves the command without a shortcut, and it has to be assigned on the browser's shortcuts page, see [Keyboard shortcuts](#keyboard-shortcuts).
 
 The extension badge shows `OK` or `ERR` for 1.5 seconds after each copy. Menu items and shortcut names follow the browser language (English or Russian).
 
@@ -44,12 +46,14 @@ A markdown link is `[title](url)`. The title is the last non-empty path segment,
 
 The extension is not in the Chrome Web Store yet and is installed as an unpacked extension.
 
-1. Get the code: `git clone https://github.com/VitalyOstanin/copy-readable-url.git`, or download the ZIP from GitHub and unpack it.
+Releases: <https://github.com/VitalyOstanin/copy-readable-url/releases/latest>
+
+1. Download `copy-readable-url-<version>.zip` from the [latest release](https://github.com/VitalyOstanin/copy-readable-url/releases/latest) and unpack it; you get a `copy-readable-url` directory. Alternatively, `git clone https://github.com/VitalyOstanin/copy-readable-url.git`.
 2. Open `chrome://extensions` (`brave://extensions` in Brave, `edge://extensions` in Edge) and turn on *Developer mode*.
-3. Click *Load unpacked* and select the project directory (the one containing `manifest.json`).
+3. Click *Load unpacked* and select the `copy-readable-url` directory (the one containing `manifest.json`).
 4. Check that both shortcuts are assigned, see [Keyboard shortcuts](#keyboard-shortcuts).
 
-To update: `git pull` (or unpack a fresh ZIP into the same directory) and press the reload button on the extension card. Keep the directory in place: the browser loads the extension from it on every start.
+To update: unpack the ZIP from the [latest release](https://github.com/VitalyOstanin/copy-readable-url/releases/latest) over the same directory (or run `git pull` in a clone) and press the reload button on the extension card. Keep the directory in place: the browser loads the extension from it on every start.
 
 ## Keyboard shortcuts
 
@@ -94,6 +98,8 @@ No build step: the extension is plain JavaScript modules loaded as is. Tests nee
 ```
 npm test
 ```
+
+`tools/package.sh` builds the release ZIP (`dist/copy-readable-url-<version>.zip`) from the committed `HEAD`; it needs `git` and `jq`.
 
 ## License
 
