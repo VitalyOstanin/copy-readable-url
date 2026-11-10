@@ -40,7 +40,7 @@ When the whole address is copied, Chromium's address bar writes the canonical UR
 
 The extension badge shows `OK` or `ERR` for 1.5 seconds after each copy. Menu items and shortcut names follow the browser language (English or Russian).
 
-A markdown link is `[title](url)`. The title is the last non-empty path segment, fully decoded (`%20` becomes a space), or the host name when the path is empty.
+A markdown link is `[title](url)`. The title is the last non-empty path segment, fully decoded (`%20` becomes a space), or the host name when the path is empty. A literal `+` in the segment also becomes a space in the title, since wikis such as Confluence use it for spaces in page names; `%2B` stays `+`. The URL itself is not changed.
 
 ## Installation
 

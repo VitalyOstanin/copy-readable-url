@@ -67,6 +67,15 @@ test('keeps guillemets and quotes encoded so messengers keep the whole link', ()
   );
 });
 
+test('title turns a literal plus into a space, keeps an encoded one', () => {
+  assert.equal(titleFromUrl('https://example.org/A+b+%C2%AB%D0%92%C2%BB'), 'A b «В»');
+  assert.equal(titleFromUrl('https://example.org/C%2B%2B'), 'C++');
+  assert.equal(
+    markdownLink('https://example.org/A+b'),
+    '[A b](https://example.org/A+b)',
+  );
+});
+
 test('title collapses newlines and falls back to host', () => {
   assert.equal(titleFromUrl('https://example.org/a%0A%0Ab'), 'a b');
   assert.equal(titleFromUrl('https://example.org/%20/'), 'example.org');

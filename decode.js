@@ -39,7 +39,9 @@ function decodePercent(text) {
 }
 
 // Title is the last non-empty path segment, fully decoded, with whitespace
-// runs collapsed; the host when the path gives nothing.
+// runs collapsed; the host when the path gives nothing. A literal `+` becomes a
+// space first, as wikis such as Confluence use it for spaces in page names; an
+// encoded plus (%2B) still decodes to `+`.
 export function titleFromUrl(url) {
   let parsed;
   try {
@@ -47,7 +49,7 @@ export function titleFromUrl(url) {
   } catch {
     return url;
   }
-  const segment = parsed.pathname.split('/').filter(Boolean).pop() ?? '';
+  const segment = (parsed.pathname.split('/').filter(Boolean).pop() ?? '').replaceAll('+', ' ');
   let title;
   try {
     title = decodeURIComponent(segment);
